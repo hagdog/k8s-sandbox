@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pyserver
+  labels:
+    app: pyserver
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      run: pyserver
+  template:
+    metadata:
+      labels:
+        run: pyserver
+    spec:
+      containers:
+      - name: pyserver
+        image: rspringob/pyserver:0.1
+        ports:
+        - containerPort: 8088
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+    name: pyserver
+    labels:
+        run: pyserver
+spec:
+    ports:
+    - port: 8088
+      protocol: TCP
+    selector:
+        run: pyserver
+
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: pyserver-ingress
+spec:
+  rules:
+  - host: localhost
+    http:
+      paths:
+      - path: /basicnginx
+        backend:
+          serviceName: pyserver
+          servicePort: 8088

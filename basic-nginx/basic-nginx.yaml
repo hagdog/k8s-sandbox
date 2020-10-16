@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: basic-nginx
+  labels:
+    app: basic-nginx
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      run: basic-nginx
+  template:
+    metadata:
+      labels:
+        run: basic-nginx
+    spec:
+      containers:
+      - name: basic-nginx
+        image: rspringob/basic-nginx:0.1
+        ports:
+        - containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+    name: basic-nginx
+    labels:
+        run: basic-nginx
+spec:
+    ports:
+    - port: 80
+      protocol: TCP
+    selector:
+        run: basic-nginx
+
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: basic-nginx-ingress
+spec:
+  rules:
+  - host: localhost
+    http:
+      paths:
+      - path: /basicnginx
+        backend:
+          serviceName: basic-nginx
+          servicePort: 80
